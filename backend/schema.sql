@@ -1,0 +1,89 @@
+CREATE DATABASE IF NOT EXISTS bombay_dry_cleaners;
+USE bombay_dry_cleaners;
+
+CREATE TABLE IF NOT EXISTS users (
+    id VARCHAR(36) PRIMARY KEY,
+    email VARCHAR(255) UNIQUE,
+    phone VARCHAR(20) UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS profiles (
+    user_id VARCHAR(36) PRIMARY KEY,
+    full_name VARCHAR(255),
+    mobile_number VARCHAR(20),
+    address TEXT,
+    avatar_url TEXT,
+    is_admin BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS pricing_categories (
+    id VARCHAR(36) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    icon VARCHAR(50),
+    sort_order INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS pricing_items (
+    id VARCHAR(36) PRIMARY KEY,
+    category_id VARCHAR(36),
+    name VARCHAR(255) NOT NULL,
+    base_price INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES pricing_categories(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+    id VARCHAR(36) PRIMARY KEY,
+    user_id VARCHAR(36),
+    service_name VARCHAR(255) NOT NULL,
+    total_items INT NOT NULL,
+    total_price INT NOT NULL,
+    delivery_charge INT NOT NULL,
+    pickup_address TEXT NOT NULL,
+    delivery_option VARCHAR(100) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    status VARCHAR(50) DEFAULT 'pending',
+    items JSON NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Seed initial data for pricing_categories
+INSERT INTO pricing_categories (id, name, icon, sort_order) VALUES 
+('11111111-1111-1111-1111-111111111111', 'Daily Wear', '👕', 1),
+('22222222-2222-2222-2222-222222222222', 'Traditional / Ethnic', '👗', 2),
+('33333333-3333-3333-3333-333333333333', 'Formal Wear', '👔', 3),
+('44444444-4444-4444-4444-444444444444', 'Home Items', '🛏️', 4),
+('55555555-5555-5555-5555-555555555555', 'Accessories / Others', '👟', 5);
+
+-- Seed initial data for pricing_items
+INSERT INTO pricing_items (id, category_id, name, base_price) VALUES
+(UUID(), '11111111-1111-1111-1111-111111111111', 'Shirt', 30),
+(UUID(), '11111111-1111-1111-1111-111111111111', 'T-shirt', 25),
+(UUID(), '11111111-1111-1111-1111-111111111111', 'Jeans', 40),
+(UUID(), '11111111-1111-1111-1111-111111111111', 'Pants', 35),
+(UUID(), '11111111-1111-1111-1111-111111111111', 'Shorts', 20),
+(UUID(), '11111111-1111-1111-1111-111111111111', 'Kurta', 35),
+(UUID(), '22222222-2222-2222-2222-222222222222', 'Saree', 80),
+(UUID(), '22222222-2222-2222-2222-222222222222', 'Lehenga', 250),
+(UUID(), '22222222-2222-2222-2222-222222222222', 'Suit / Salwar Kameez', 100),
+(UUID(), '22222222-2222-2222-2222-222222222222', 'Sherwani', 200),
+(UUID(), '22222222-2222-2222-2222-222222222222', 'Dupatta', 40),
+(UUID(), '33333333-3333-3333-3333-333333333333', 'Blazer', 120),
+(UUID(), '33333333-3333-3333-3333-333333333333', 'Coat', 150),
+(UUID(), '33333333-3333-3333-3333-333333333333', 'Tie', 30),
+(UUID(), '33333333-3333-3333-3333-333333333333', 'Formal Shirt', 40),
+(UUID(), '33333333-3333-3333-3333-333333333333', 'Trousers', 45),
+(UUID(), '44444444-4444-4444-4444-444444444444', 'Bedsheet', 60),
+(UUID(), '44444444-4444-4444-4444-444444444444', 'Blanket', 150),
+(UUID(), '44444444-4444-4444-4444-444444444444', 'Pillow Cover', 25),
+(UUID(), '44444444-4444-4444-4444-444444444444', 'Curtains', 100),
+(UUID(), '44444444-4444-4444-4444-444444444444', 'Sofa Cover', 180),
+(UUID(), '55555555-5555-5555-5555-555555555555', 'Shoes Cleaning', 100),
+(UUID(), '55555555-5555-5555-5555-555555555555', 'Bags', 120),
+(UUID(), '55555555-5555-5555-5555-555555555555', 'Jackets', 100),
+(UUID(), '55555555-5555-5555-5555-555555555555', 'Woolen Clothes', 80);
