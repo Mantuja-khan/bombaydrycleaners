@@ -11,6 +11,7 @@ import { ArrowLeft, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { deliveryOptions } from "@/lib/delivery";
+import { API_URL } from "@/config";
 
 interface OrderItem {
   name: string;
@@ -70,7 +71,7 @@ const CheckoutPage = () => {
     
     setStep("loading");
     try {
-      const res = await fetch("http://localhost:7004/api/orders", {
+      const res = await fetch(`${API_URL}/api/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

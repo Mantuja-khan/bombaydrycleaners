@@ -6,6 +6,7 @@ import { Minus, Plus, ShoppingBag, Sparkles, ArrowRight, MapPin, Edit2 } from "l
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
+import { API_URL } from "@/config";
 
 type ServiceType = "wash_fold" | "dry_clean" | "iron" | "premium";
 
@@ -96,7 +97,7 @@ const BookingPage = () => {
   const [categories, setCategories] = useState<Category[]>(defaultCategories);
 
   useEffect(() => {
-    fetch("http://localhost:7004/api/pricing")
+    fetch(`${API_URL}/api/pricing`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch");
         return res.json();

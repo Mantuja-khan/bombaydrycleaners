@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { API_URL } from "@/config";
 
 interface UserProfile {
   user_id: string;
@@ -42,7 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchProfile = async (token: string) => {
     try {
-      const response = await fetch("http://localhost:7004/api/auth/me", {
+      const response = await fetch(`${API_URL}/api/auth/me`, {
         headers: {
           "Authorization": `Bearer ${token}`
         }

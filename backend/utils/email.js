@@ -45,7 +45,7 @@ const sendWelcomeEmail = async (toEmail, name) => {
                    <p style="font-size: 15px;">Thank you for joining <strong>Bombay Dry Cleaners</strong>! We are absolutely thrilled to have you on board with us.</p>
                    <p style="font-size: 15px;">Whether it's your everyday laundry, delicate dry cleaning, or professional steam ironing, we are committed to delivering the highest level of care and freshness directly to your doorstep.</p>
                    <div style="margin: 30px 0; text-align: center;">
-                     <a href="http://localhost:5173/booking" style="background-color: #F8C463; color: #0F172A; text-decoration: none; padding: 12px 28px; font-weight: bold; border-radius: 30px; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(248, 196, 99, 0.2);">Book Your First Order</a>
+                     <a href="https://bombaydrycleaners.com/booking" style="background-color: #F8C463; color: #0F172A; text-decoration: none; padding: 12px 28px; font-weight: bold; border-radius: 30px; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px rgba(248, 196, 99, 0.2);">Book Your First Order</a>
                    </div>
                    <p style="font-size: 14px; color: #666666; border-top: 1px solid #eeeeee; padding-top: 20px; margin-bottom: 0;">
                      Freshness & Care Delivered,<br />

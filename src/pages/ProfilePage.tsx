@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Camera, Save, LogOut, User, Phone, MapPin, Loader2, ShoppingBag, Calendar, Sparkles, Clock } from "lucide-react";
+import { API_URL } from "@/config";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ const ProfilePage = () => {
 
   const fetchMyOrders = async () => {
     try {
-      const res = await fetch("http://localhost:7004/api/orders/my", {
+      const res = await fetch(`${API_URL}/api/orders/my`, {
         headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
       });
       if (res.ok) {
@@ -74,7 +75,7 @@ const ProfilePage = () => {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch("http://localhost:7004/api/auth/me", {
+      const res = await fetch(`${API_URL}/api/auth/me`, {
         headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
       });
       if (!res.ok) throw new Error("Failed to fetch profile");
@@ -97,7 +98,7 @@ const ProfilePage = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await fetch("http://localhost:7004/api/auth/profile", {
+      const res = await fetch(`${API_URL}/api/auth/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

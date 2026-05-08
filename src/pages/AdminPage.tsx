@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import AdminSettings from "@/components/admin/AdminSettings";
+import { API_URL } from "@/config";
 
 const AdminPage = () => {
   const { user, isAdmin, loading: authLoading } = useAuth();
@@ -44,7 +45,7 @@ const AdminPage = () => {
   const { data: orders, isLoading: ordersLoading } = useQuery({
     queryKey: ["admin-orders"],
     queryFn: async (): Promise<any[]> => {
-      const res = await fetch("http://localhost:7004/api/orders", {
+      const res = await fetch(`${API_URL}/api/orders`, {
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
@@ -58,7 +59,7 @@ const AdminPage = () => {
   const { data: pricingCategories, isLoading: pricingLoading } = useQuery({
     queryKey: ["admin-pricing"],
     queryFn: async (): Promise<any[]> => {
-      const res = await fetch("http://localhost:7004/api/pricing");
+      const res = await fetch(`${API_URL}/api/pricing`);
       if (!res.ok) throw new Error("Failed to load pricing");
       const { categories: catData, items: itemData } = await res.json();
 
@@ -74,7 +75,7 @@ const AdminPage = () => {
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
-      const res = await fetch(`http://localhost:7004/api/orders/${orderId}/status`, {
+      const res = await fetch(`${API_URL}/api/orders/${orderId}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -94,7 +95,7 @@ const AdminPage = () => {
   const handleUpdatePrice = async () => {
     if (!editingItem) return;
     try {
-      const res = await fetch(`http://localhost:7004/api/pricing/items/${editingItem.id}`, {
+      const res = await fetch(`${API_URL}/api/pricing/items/${editingItem.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -123,7 +124,7 @@ const AdminPage = () => {
     if (!addingCategory || !newItemName) return;
     try {
       const base = parseInt(newItemPrice || "0");
-      const res = await fetch("http://localhost:7004/api/pricing/items", {
+      const res = await fetch(`${API_URL}/api/pricing/items`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -158,7 +159,7 @@ const AdminPage = () => {
   const handleDeleteItem = async (itemId: string) => {
     if (!window.confirm("Are you sure you want to delete this pricing item?")) return;
     try {
-      const res = await fetch(`http://localhost:7004/api/pricing/items/${itemId}`, {
+      const res = await fetch(`${API_URL}/api/pricing/items/${itemId}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("token")}`

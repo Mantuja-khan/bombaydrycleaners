@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Loader2, RefreshCw, Database } from "lucide-react";
+import { API_URL } from "@/config";
 
 const AdminSettings = () => {
   const { user } = useAuth();
@@ -13,7 +14,7 @@ const AdminSettings = () => {
     
     setResetting(true);
     try {
-      const res = await fetch("http://localhost:7004/api/auth/reset-admin", {
+      const res = await fetch(`${API_URL}/api/auth/reset-admin`, {
         method: "POST",
         headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
       });

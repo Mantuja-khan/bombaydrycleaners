@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Mail, Phone, Lock, User, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useEffect } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
+import { API_URL } from "@/config";
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -55,7 +56,7 @@ const AuthPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:7004/api/auth/forgot-password", {
+      const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: forgotEmail }),
@@ -90,7 +91,7 @@ const AuthPage = () => {
     }
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:7004/api/auth/reset-password", {
+      const res = await fetch(`${API_URL}/api/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: forgotEmail, otp: forgotOtp, password: newPassword }),
@@ -131,7 +132,7 @@ const AuthPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:7004/api/auth/verify-otp", {
+      const res = await fetch(`${API_URL}/api/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: tempEmail, otp }),
@@ -154,7 +155,7 @@ const AuthPage = () => {
     setLoading(true);
     try {
       const endpoint = isLogin ? "/login" : "/register";
-      const res = await fetch(`http://localhost:7004/api/auth${endpoint}`, {
+      const res = await fetch(`${API_URL}/api/auth${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -219,7 +220,7 @@ const AuthPage = () => {
     onSuccess: async (tokenResponse) => {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:7004/api/auth/google", {
+        const res = await fetch(`${API_URL}/api/auth/google`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token: tokenResponse.access_token }),

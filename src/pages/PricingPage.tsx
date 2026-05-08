@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle } from "lucide-react";
+import { API_URL } from "@/config";
 
 const defaultCategories = [
   {
@@ -66,7 +67,7 @@ const PricingPage = () => {
   const [categories, setCategories] = useState<any[]>(defaultCategories);
 
   useEffect(() => {
-    fetch("http://localhost:7004/api/pricing")
+    fetch(`${API_URL}/api/pricing`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch");
         return res.json();

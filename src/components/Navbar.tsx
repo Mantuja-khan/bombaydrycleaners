@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Menu, X, ChevronDown, User, LogIn, Settings } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { API_URL } from "@/config";
 
 const navLinks = [
   { label: "Home", href: "/", isRoute: true },
@@ -37,7 +38,7 @@ const Navbar = () => {
 
   useEffect(() => {
     if (user) {
-      fetch("http://localhost:7004/api/orders/my", {
+      fetch(`${API_URL}/api/orders/my`, {
         headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
       })
         .then(res => res.json())
