@@ -12,17 +12,14 @@ async function migrate() {
             console.log('Adding wash_fold_price column...');
             await db.query('ALTER TABLE pricing_items ADD COLUMN wash_fold_price INT DEFAULT NULL');
         }
-        
         if (!columnNames.includes('dry_cleaning_price')) {
             console.log('Adding dry_cleaning_price column...');
             await db.query('ALTER TABLE pricing_items ADD COLUMN dry_cleaning_price INT DEFAULT NULL');
         }
-        
         if (!columnNames.includes('iron_only_price')) {
             console.log('Adding iron_only_price column...');
             await db.query('ALTER TABLE pricing_items ADD COLUMN iron_only_price INT DEFAULT NULL');
         }
-        
         if (!columnNames.includes('premium_care_price')) {
             console.log('Adding premium_care_price column...');
             await db.query('ALTER TABLE pricing_items ADD COLUMN premium_care_price INT DEFAULT NULL');
