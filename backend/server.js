@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const connectDB = require('./config/db');
 const { initDatabase } = require('./utils/initDatabase');
 
 const app = express();
@@ -12,6 +13,9 @@ const PORT = process.env.PORT || 7004;
 
 async function startServer() {
     try {
+        // Connect to MongoDB
+        await connectDB();
+
         // Initialize database tables if they do not exist
         await initDatabase();
 
