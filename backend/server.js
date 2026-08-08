@@ -9,8 +9,9 @@ const app = express();
 const allowedOrigins = [
     'https://bombaydrycleaners.com',
     'https://www.bombaydrycleaners.com',
-    'http://localhost:5173',
-    'http://localhost:3000'
+    'https://api.bombaydrycleaners.com',
+    'http://localhost:8080',
+    'http://localhost:7004'
 ];
 
 const corsOptions = {
@@ -27,7 +28,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(express.json());
 
 const PORT = process.env.PORT || 7004;
@@ -44,11 +45,13 @@ async function startServer() {
         const authRoutes = require('./routes/auth');
         const pricingRoutes = require('./routes/pricing');
         const orderRoutes = require('./routes/orders');
+        const paymentRoutes = require('./routes/payments');
         const { seedAdmin } = require('./utils/seedAdmin');
 
         app.use('/api/auth', authRoutes);
         app.use('/api/pricing', pricingRoutes);
         app.use('/api/orders', orderRoutes);
+        app.use('/api/payments', paymentRoutes);
 
         app.listen(PORT, async () => {
             console.log(`🚀 Server running on port ${PORT}`);

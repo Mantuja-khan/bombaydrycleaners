@@ -297,6 +297,52 @@ const ProfilePage = () => {
                         </div>
                       </div>
                     </div>
+                    {/* Delivery & Payment Details section */}
+                    <div className="mt-4 pt-4 border-t border-dashed border-border space-y-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+                        <div className="bg-muted/40 p-2 rounded-lg">
+                          <div className="font-bold text-muted-foreground">Payment Status</div>
+                          <span className={`inline-block mt-1 font-semibold px-2 py-0.5 rounded text-[10px] uppercase border ${
+                            order.payment_status === 'paid' ? 'bg-green-50 text-green-700 border-green-200' :
+                            order.payment_status === 'failed' ? 'bg-red-50 text-red-700 border-red-200' :
+                            'bg-yellow-50 text-yellow-700 border-yellow-200'
+                          }`}>
+                            {order.payment_status || 'pending'}
+                          </span>
+                        </div>
+                        <div className="bg-muted/40 p-2 rounded-lg">
+                          <div className="font-bold text-muted-foreground">Payment Method</div>
+                          <div className="mt-1 font-medium capitalize text-foreground">{order.payment_method}</div>
+                        </div>
+                        <div className="bg-muted/40 p-2 rounded-lg">
+                          <div className="font-bold text-muted-foreground">Pickup Status</div>
+                          <span className={`inline-block mt-1 font-semibold px-2 py-0.5 rounded text-[10px] uppercase border ${
+                            order.pickup_status === 'picked_up' ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                            'bg-yellow-50 text-yellow-700 border-yellow-200'
+                          }`}>
+                            {order.pickup_status === 'picked_up' ? 'Picked Up' : 'Pending'}
+                          </span>
+                        </div>
+                        <div className="bg-muted/40 p-2 rounded-lg">
+                          <div className="font-bold text-muted-foreground">Delivery Status</div>
+                          <span className={`inline-block mt-1 font-semibold px-2 py-0.5 rounded text-[10px] uppercase border ${
+                            order.drop_status === 'dropped' ? 'bg-teal-50 text-teal-700 border-teal-200' :
+                            'bg-yellow-50 text-yellow-700 border-yellow-200'
+                          }`}>
+                            {order.drop_status === 'dropped' ? 'Dropped / Delivered' : 'Pending'}
+                          </span>
+                        </div>
+                      </div>
+                      {order.delivery_details && (
+                        <div className="bg-primary/5 border border-primary/10 rounded-lg p-3 text-xs text-foreground flex items-start gap-2 text-left">
+                          <Sparkles className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold text-primary block mb-0.5">Delivery Details & Updates:</span>
+                            <p className="text-muted-foreground leading-relaxed">{order.delivery_details}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

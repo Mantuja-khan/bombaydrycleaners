@@ -21,10 +21,25 @@ interface OrderItem {
 
 type PaymentStep = "choose" | "online" | "cod_message" | "confirmed" | "loading";
 
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    if ((window as any).Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [step, setStep] = useState<PaymentStep>("online");
   const [selectedDelivery, setSelectedDelivery] = useState("standard");
   const [orderId, setOrderId] = useState(() => `BDC${Date.now().toString().slice(-6)}`);
@@ -92,12 +107,96 @@ const CheckoutPage = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to place order");
       
-      setOrderId(data.id.split('-')[0].toUpperCase()); // Short form of UUID
-      setStep("confirmed");
-      toast.success("Order placed successfully!");
+      const localOrderId = data.id;
+
+      if (method === "online") {
+        const isLoaded = await loadRazorpayScript();
+        if (!isLoaded) {
+          throw new Error("Razorpay payment gateway failed to load. Please check your connection.");
+        }
+
+        const keyRes = await fetch(`${API_URL}/api/payments/key`, {
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+          }
+        });
+        const keyData = await keyRes.json();
+        if (!keyRes.ok) throw new Error(keyData.error || "Failed to load payment credentials");
+
+        const rzpOrderRes = await fetch(`${API_URL}/api/payments/order`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+          },
+          body: JSON.stringify({
+            amount: grandTotal,
+            orderId: localOrderId
+          })
+        });
+        const rzpOrderData = await rzpOrderRes.json();
+        if (!rzpOrderRes.ok) throw new Error(rzpOrderData.error || "Failed to create payment order");
+
+        const options = {
+          key: keyData.key,
+          amount: rzpOrderData.amount,
+          currency: rzpOrderData.currency,
+          name: "Bombay Dry Cleaners",
+          description: `Order Payment for ${serviceName}`,
+          order_id: rzpOrderData.id,
+          handler: async function (response: any) {
+            setStep("loading");
+            try {
+              const verifyRes = await fetch(`${API_URL}/api/payments/verify`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify({
+                  orderId: localOrderId,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature
+                })
+              });
+              const verifyData = await verifyRes.json();
+              if (!verifyRes.ok) throw new Error(verifyData.error || "Payment verification failed");
+
+              setOrderId(localOrderId.split('-')[0].toUpperCase());
+              setStep("confirmed");
+              toast.success("Payment successful! Order placed.");
+            } catch (err: any) {
+              toast.error("Payment verification failed: " + err.message);
+              setStep("online");
+            }
+          },
+          prefill: {
+            name: profile?.full_name || "",
+            email: user?.email || "",
+            contact: profile?.mobile_number || ""
+          },
+          theme: {
+            color: "#0F172A"
+          },
+          modal: {
+            ondismiss: function () {
+              setStep("online");
+              toast.error("Payment cancelled");
+            }
+          }
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
+      } else {
+        setOrderId(localOrderId.split('-')[0].toUpperCase()); // Short form of UUID
+        setStep("confirmed");
+        toast.success("Order placed successfully!");
+      }
     } catch (err: any) {
       toast.error("Failed to place order: " + err.message);
-      setStep(method === "online" ? "online" : "cod_message");
+      setStep("online");
     }
   };
 

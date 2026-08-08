@@ -1,4 +1,4 @@
-import { CreditCard, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { CreditCard, ArrowLeft, ShieldCheck, Zap } from "lucide-react";
 
 interface Props {
   grandTotal: number;
@@ -13,20 +13,33 @@ const OnlinePayment = ({ grandTotal, onBack, onConfirm }: Props) => (
     </div>
     <h3 className="font-bold text-foreground text-lg sm:text-xl">Online Payment</h3>
     <p className="text-muted-foreground text-xs sm:text-sm">
-      Pay the full amount of <span className="font-bold text-primary text-base sm:text-lg">₹{grandTotal}</span> securely online.
+      Pay the total amount of <span className="font-bold text-primary text-base sm:text-lg">₹{grandTotal}</span> securely.
     </p>
-    <div className="bg-muted/50 rounded-xl p-3 sm:p-4 space-y-2">
-      <p className="text-xs sm:text-sm text-muted-foreground">Payment gateway integration coming soon.</p>
-      <p className="text-xs text-muted-foreground">You will be redirected to a secure payment page.</p>
+
+    <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 text-left space-y-2">
+      <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-primary">
+        <ShieldCheck className="w-4 h-4 text-primary" />
+        256-Bit SSL Encrypted & Instant Confirmation
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Supports UPI (GPay, PhonePe, Paytm), Credit / Debit Cards, Net Banking, and Wallets via Live Razorpay Gateway.
+      </p>
     </div>
+
     <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-      <button onClick={onBack} className="inline-flex items-center justify-center gap-2 border border-border px-5 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium text-foreground hover:bg-muted transition-colors">
+      <button 
+        onClick={onBack} 
+        className="inline-flex items-center justify-center gap-2 border border-border px-5 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium text-foreground hover:bg-muted transition-colors"
+      >
         <ArrowLeft className="w-4 h-4" />
         Back
       </button>
-      <button onClick={onConfirm} className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-semibold text-xs sm:text-sm hover:opacity-90 transition-opacity">
-        <CheckCircle2 className="w-4 h-4" />
-        Pay ₹{grandTotal}
+      <button 
+        onClick={onConfirm} 
+        className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-semibold text-xs sm:text-sm hover:opacity-90 transition-opacity"
+      >
+        <Zap className="w-4 h-4" />
+        Pay ₹{grandTotal} with Razorpay
       </button>
     </div>
   </div>

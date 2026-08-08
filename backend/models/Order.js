@@ -10,6 +10,12 @@ const orderSchema = new mongoose.Schema({
     pickup_address: { type: String, required: true },
     delivery_option: { type: String, required: true },
     payment_method: { type: String, required: true },
+    payment_status: { type: String, default: 'pending' },
+    razorpay_order_id: { type: String, default: null },
+    razorpay_payment_id: { type: String, default: null },
+    pickup_status: { type: String, default: 'pending' },
+    drop_status: { type: String, default: 'pending' },
+    delivery_details: { type: String, default: '' },
     status: { type: String, default: 'confirmed' },
     items: { type: mongoose.Schema.Types.Mixed, required: true }
 }, { 

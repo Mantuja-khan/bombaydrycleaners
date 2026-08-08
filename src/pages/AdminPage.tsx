@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
@@ -73,7 +73,7 @@ const AdminPage = () => {
     enabled: !!isAdmin && activeTab === "pricing",
   });
 
-  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+  const updateOrderFields = async (orderId: string, fields: any) => {
     try {
       const res = await fetch(`${API_URL}/api/orders/${orderId}/status`, {
         method: "PUT",
@@ -81,11 +81,11 @@ const AdminPage = () => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify(fields)
       });
-      if (!res.ok) throw new Error("Failed to update status");
+      if (!res.ok) throw new Error("Failed to update order");
       
-      toast.success("Order status updated");
+      toast.success("Order updated successfully");
       queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
     } catch (err: any) {
       toast.error(err.message);
@@ -243,42 +243,114 @@ const AdminPage = () => {
                     </tr>
                   )}
                   {orders?.map((order: any) => (
-                    <tr key={order.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-6 py-4 font-mono text-xs">{order.id.slice(0, 8)}</td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-foreground">{order.profiles?.full_name || "Unknown"}</div>
-                        <div className="text-xs text-muted-foreground">{order.profiles?.mobile_number || ""}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium">{order.service_name}</div>
-                        <div className="text-xs text-muted-foreground">{order.total_items} items</div>
-                      </td>
-                      <td className="px-6 py-4 font-bold text-primary">₹{order.total_price + order.delivery_charge}</td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2.5 py-1 text-xs font-bold rounded-full border ${
-                          order.status === 'delivered' ? 'bg-green-100 text-green-700 border-green-200' : 
-                          order.status === 'pending' ? 'bg-yellow-100 text-yellow-700 border-yellow-200' :
-                          'bg-blue-100 text-blue-700 border-blue-200'
-                        }`}>
-                          {order.status.toUpperCase()}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <select
-                          className="border rounded px-2 py-1 text-xs bg-background"
-                          value={order.status}
-                          onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="confirmed">Confirmed</option>
-                          <option value="picked_up">Picked Up</option>
-                          <option value="in_process">In Process</option>
-                          <option value="out_for_delivery">Out for Delivery</option>
-                          <option value="delivered">Delivered</option>
-                          <option value="cancelled">Cancelled</option>
-                        </select>
-                      </td>
-                    </tr>
+                    <Fragment key={order.id}>
+                      <tr className="hover:bg-muted/30 transition-colors border-t border-border">
+                        <td className="px-6 py-4 font-mono text-xs">{order.id.slice(0, 8)}</td>
+                        <td className="px-6 py-4">
+                          <div className="font-medium text-foreground">{order.full_name || "Unknown"}</div>
+                          <div className="text-xs text-muted-foreground">{order.mobile_number || ""}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="font-medium">{order.service_name}</div>
+                          <div className="text-xs text-muted-foreground">{order.total_items} items</div>
+                        </td>
+                        <td className="px-6 py-4 font-bold text-primary">₹{order.total_price + order.delivery_charge}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col gap-1.5">
+                            <span className={`w-fit px-2.5 py-1 text-xs font-bold rounded-full border ${
+                              order.status === 'delivered' ? 'bg-green-100 text-green-700 border-green-200' : 
+                              order.status === 'pending' ? 'bg-yellow-100 text-yellow-700 border-yellow-200' :
+                              'bg-blue-100 text-blue-700 border-blue-200'
+                            }`}>
+                              {order.status.toUpperCase()}
+                            </span>
+                            <span className={`w-fit px-2 py-0.5 text-[10px] font-semibold rounded border ${
+                              order.payment_status === 'paid' ? 'bg-green-50 text-green-700 border-green-200' :
+                              order.payment_status === 'failed' ? 'bg-red-50 text-red-700 border-red-200' :
+                              'bg-yellow-50 text-yellow-700 border-yellow-200'
+                            }`}>
+                              PAY: {(order.payment_status || 'pending').toUpperCase()}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col gap-1.5">
+                            <select
+                              className="border rounded px-2 py-1 text-xs bg-background w-full max-w-[130px]"
+                              value={order.status}
+                              onChange={(e) => updateOrderFields(order.id, { status: e.target.value })}
+                            >
+                              <option value="pending">Pending</option>
+                              <option value="confirmed">Confirmed</option>
+                              <option value="picked_up">Picked Up</option>
+                              <option value="in_process">In Process</option>
+                              <option value="out_for_delivery">Out for Delivery</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="cancelled">Cancelled</option>
+                            </select>
+                            <select
+                              className="border rounded px-2 py-1 text-[11px] bg-background w-full max-w-[130px]"
+                              value={order.payment_status || 'pending'}
+                              onChange={(e) => updateOrderFields(order.id, { payment_status: e.target.value })}
+                            >
+                              <option value="pending">Pay Pending</option>
+                              <option value="paid">Pay Paid</option>
+                              <option value="failed">Pay Failed</option>
+                            </select>
+                          </div>
+                        </td>
+                      </tr>
+                      {/* Sub-row for detailed tracking */}
+                      <tr className="bg-muted/10 border-b border-border">
+                        <td colSpan={6} className="px-6 py-3">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
+                            <div className="flex gap-4">
+                              <div>
+                                <span className="font-semibold text-muted-foreground mr-1.5">Pickup:</span>
+                                <select
+                                  className="border rounded px-2 py-1 bg-background text-[11px]"
+                                  value={order.pickup_status || 'pending'}
+                                  onChange={(e) => updateOrderFields(order.id, { pickup_status: e.target.value })}
+                                >
+                                  <option value="pending">Pending</option>
+                                  <option value="picked_up">Picked Up</option>
+                                </select>
+                              </div>
+                              <div>
+                                <span className="font-semibold text-muted-foreground mr-1.5">Drop / Delivery:</span>
+                                <select
+                                  className="border rounded px-2 py-1 bg-background text-[11px]"
+                                  value={order.drop_status || 'pending'}
+                                  onChange={(e) => updateOrderFields(order.id, { drop_status: e.target.value })}
+                                >
+                                  <option value="pending">Pending</option>
+                                  <option value="dropped">Dropped / Delivered</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div className="flex-1 max-w-md flex items-center gap-2">
+                              <span className="font-semibold text-muted-foreground whitespace-nowrap">Delivery Info:</span>
+                              <input
+                                type="text"
+                                className="flex-1 text-[11px] border rounded px-2 py-1 bg-background"
+                                defaultValue={order.delivery_details || ''}
+                                placeholder="e.g. Agent John - 9876543210, Delivered at 5 PM"
+                                onBlur={(e) => {
+                                  if (e.target.value !== (order.delivery_details || '')) {
+                                    updateOrderFields(order.id, { delivery_details: e.target.value });
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    updateOrderFields(order.id, { delivery_details: (e.target as HTMLInputElement).value });
+                                  }
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </Fragment>
                   ))}
                 </tbody>
               </table>

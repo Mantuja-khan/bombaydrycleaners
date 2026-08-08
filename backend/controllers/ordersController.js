@@ -6,6 +6,7 @@ const createOrder = async (req, res) => {
     const { service_name, total_items, total_price, delivery_charge, pickup_address, delivery_option, payment_method, items } = req.body;
     try {
         const orderId = uuidv4();
+        const initialStatus = payment_method === 'online' ? 'pending' : 'confirmed';
         await Order.create({
             id: orderId,
             user_id: req.userId,
@@ -16,7 +17,11 @@ const createOrder = async (req, res) => {
             pickup_address,
             delivery_option,
             payment_method,
-            status: 'confirmed',
+            payment_status: 'pending',
+            pickup_status: 'pending',
+            drop_status: 'pending',
+            delivery_details: '',
+            status: initialStatus,
             items
         });
         res.status(201).json({ id: orderId, message: 'Order created' });
@@ -53,10 +58,17 @@ const getOrders = async (req, res) => {
 };
 
 const updateOrderStatus = async (req, res) => {
-    const { status } = req.body;
+    const { status, payment_status, pickup_status, drop_status, delivery_details } = req.body;
     try {
-        await Order.findOneAndUpdate({ id: req.params.id }, { status });
-        res.json({ message: 'Order status updated' });
+        const updateFields = {};
+        if (status !== undefined) updateFields.status = status;
+        if (payment_status !== undefined) updateFields.payment_status = payment_status;
+        if (pickup_status !== undefined) updateFields.pickup_status = pickup_status;
+        if (drop_status !== undefined) updateFields.drop_status = drop_status;
+        if (delivery_details !== undefined) updateFields.delivery_details = delivery_details;
+
+        await Order.findOneAndUpdate({ id: req.params.id }, updateFields);
+        res.json({ message: 'Order updated' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
