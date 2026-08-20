@@ -34,7 +34,15 @@ const ContactPage = () => {
                   </div>
                   <div>
                     <h3 className="font-bold text-lg text-foreground mb-1">Our Location</h3>
-                    <p className="text-muted-foreground">123 Clean Street, Laundry District<br/>Mumbai, MH 400001, India</p>
+                    <a 
+                      href="https://www.google.com/maps/place/Bombay+Dry+Cleaners/@28.1965294,76.8099878,640m/data=!3m2!1e3!5s0x390d4817a4198ab7:0xc0442dc66ad8526f!4m14!1m7!3m6!1s0x390d4937a993c1c7:0xaf7c37c3d0b745d0!2sBombay+Dry+Cleaners!8m2!3d28.1965247!4d76.8125627!16s%2Fg%2F11t2q8v9jn!3m5!1s0x390d4937a993c1c7:0xaf7c37c3d0b745d0!8m2!3d28.1965247!4d76.8125627!16s%2Fg%2F11t2q8v9jn?entry=ttu&g_ep=EgoyMDI2MDgxNy4wIKXMDSoASAFQAw%3D%3D"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground hover:text-primary transition-colors block group"
+                    >
+                      Alwar bypass, Bhiwadi, Alwar (Rajasthan)
+                      <span className="text-xs text-primary font-semibold block mt-1 group-hover:underline">View on Google Maps →</span>
+                    </a>
                   </div>
                 </div>
 
@@ -54,7 +62,7 @@ const ContactPage = () => {
                   </div>
                   <div>
                     <h3 className="font-bold text-lg text-foreground mb-1">Call Us</h3>
-                    <p className="text-muted-foreground">+91 98765 43210</p>
+                    <a href="tel:8306520830" className="text-muted-foreground hover:text-primary transition-colors">+91 8306520830</a>
                   </div>
                 </div>
 
@@ -70,17 +78,30 @@ const ContactPage = () => {
               </div>
             </div>
 
-            <div className="rounded-2xl overflow-hidden h-64 shadow-md border border-border">
-              {/* Note: This is a placeholder standard iframe embed. In a real scenario, use actual Google Maps URL */}
+            <div className="rounded-2xl overflow-hidden shadow-md border border-border bg-card flex flex-col">
               <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d241317.11609823277!2d72.74109995709657!3d19.08219783958221!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c6306644edc1%3A0x5da4ed8f8d648c69!2sMumbai%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
+                title="Bombay Dry Cleaners Google Map"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3516.480000000000!2d76.8125627!3d28.1965247!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d4937a993c1c7%3A0xaf7c37c3d0b745d0!2sBombay%20Dry%20Cleaners!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
                 width="100%" 
-                height="100%" 
+                height="240" 
                 style={{ border: 0 }} 
                 allowFullScreen={true} 
                 loading="lazy" 
                 referrerPolicy="no-referrer-when-downgrade"
               ></iframe>
+              <div className="p-3 bg-muted/40 border-t border-border flex justify-between items-center text-xs">
+                <span className="font-semibold text-foreground flex items-center gap-1.5">
+                  📍 Bombay Dry Cleaners, Bhiwadi
+                </span>
+                <a 
+                  href="https://www.google.com/maps/place/Bombay+Dry+Cleaners/@28.1965294,76.8099878,640m/data=!3m2!1e3!5s0x390d4817a4198ab7:0xc0442dc66ad8526f!4m14!1m7!3m6!1s0x390d4937a993c1c7:0xaf7c37c3d0b745d0!2sBombay+Dry+Cleaners!8m2!3d28.1965247!4d76.8125627!16s%2Fg%2F11t2q8v9jn!3m5!1s0x390d4937a993c1c7:0xaf7c37c3d0b745d0!8m2!3d28.1965247!4d76.8125627!16s%2Fg%2F11t2q8v9jn?entry=ttu&g_ep=EgoyMDI2MDgxNy4wIKXMDSoASAFQAw%3D%3D"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary font-bold hover:underline flex items-center gap-1"
+                >
+                  Open in Google Maps ↗
+                </a>
+              </div>
             </div>
           </div>
 

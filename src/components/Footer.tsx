@@ -59,15 +59,26 @@ const Footer = () => {
             <ul className="space-y-3 text-sm">
               <li className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-secondary" />
-                +91 8306520830
+                <a href="tel:8306520830" className="hover:text-secondary transition-colors">
+                  +91 8306520830
+                </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-secondary" />
-                hello@bombaycleaners.com
+                <a href="mailto:bombaydrycleaners@gmail.com" className="hover:text-secondary transition-colors">
+                  bombaydrycleaners@gmail.com
+                </a>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
-                142 Laundry Lane, Suite 8, New York, NY 10001
+                <a 
+                  href="https://www.google.com/maps/place/Bombay+Dry+Cleaners/@28.1965294,76.8099878,640m/data=!3m2!1e3!5s0x390d4817a4198ab7:0xc0442dc66ad8526f!4m14!1m7!3m6!1s0x390d4937a993c1c7:0xaf7c37c3d0b745d0!2sBombay+Dry+Cleaners!8m2!3d28.1965247!4d76.8125627!16s%2Fg%2F11t2q8v9jn!3m5!1s0x390d4937a993c1c7:0xaf7c37c3d0b745d0!8m2!3d28.1965247!4d76.8125627!16s%2Fg%2F11t2q8v9jn?entry=ttu&g_ep=EgoyMDI2MDgxNy4wIKXMDSoASAFQAw%3D%3D"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-secondary transition-colors"
+                >
+                  Alwar bypass, Bhiwadi, Alwar (Rajasthan)
+                </a>
               </li>
             </ul>
           </div>

@@ -88,12 +88,12 @@ const defaultCategories: Category[] = [
 
 const BookingPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [selectedService, setSelectedService] = useState<ServiceType>("wash_fold");
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [activeCategory, setActiveCategory] = useState(0);
   const [pickupAddress, setPickupAddress] = useState("");
-  const [editingAddress, setEditingAddress] = useState(false);
+  const [editingAddress, setEditingAddress] = useState(true);
   const [categories, setCategories] = useState<Category[]>(defaultCategories);
 
   useEffect(() => {
@@ -126,10 +126,12 @@ const BookingPage = () => {
 
   // Auto-fill address from profile
   useEffect(() => {
-    if ((user as any)?.profile?.address) {
-      setPickupAddress((user as any).profile.address);
+    const savedAddr = profile?.address || (user as any)?.profile?.address;
+    if (savedAddr && !pickupAddress) {
+      setPickupAddress(savedAddr);
+      setEditingAddress(false);
     }
-  }, [user]);
+  }, [user, profile]);
 
   const getItemPriceForService = (item: any, service: ServiceType) => {
     if (service === "wash_fold") return item.washFoldPrice !== null && item.washFoldPrice !== undefined ? item.washFoldPrice : Math.round(item.basePrice * 1);
@@ -296,11 +298,36 @@ const BookingPage = () => {
               Pickup Address
             </h2>
             <p className="text-muted-foreground text-sm mb-4 ml-9">
-              {user ? "Auto-filled from your profile. You can edit it." : "Please enter your pickup address or login to auto-fill."}
+              {user ? "Provide your pickup address or click to use your saved profile address below." : "Please enter your pickup address or login to auto-fill."}
             </p>
-            <div className="ml-9">
+
+            <div className="ml-9 space-y-3">
+              {/* Option to use saved address from profile */}
+              {(profile?.address || (user as any)?.profile?.address) && (
+                <div className="flex flex-wrap items-center justify-between gap-2 p-3.5 bg-sky-50/90 border border-sky-200 rounded-xl text-xs sm:text-sm text-sky-900 shadow-sm">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <MapPin className="w-4 h-4 text-sky-600 shrink-0" />
+                    <span className="truncate">
+                      <strong>Saved Profile Address:</strong> {profile?.address || (user as any)?.profile?.address}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const addr = profile?.address || (user as any)?.profile?.address || "";
+                      setPickupAddress(addr);
+                      setEditingAddress(false);
+                    }}
+                    className="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-lg shrink-0 transition-colors shadow-sm cursor-pointer"
+                  >
+                    Use Saved Address
+                  </button>
+                </div>
+              )}
+
+              {/* Edit vs Confirmed View */}
               {editingAddress || !pickupAddress ? (
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <div className="relative flex-1">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
@@ -310,27 +337,33 @@ const BookingPage = () => {
                       className="pl-10"
                     />
                   </div>
-                  {pickupAddress && (
+                  {pickupAddress.trim() && (
                     <button
+                      type="button"
                       onClick={() => setEditingAddress(false)}
-                      className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium"
+                      className="px-5 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity shrink-0 cursor-pointer"
                     >
-                      Save
+                      Confirm Address
                     </button>
                   )}
                 </div>
               ) : (
-                <div className="flex items-center gap-3 bg-muted/50 rounded-xl p-3">
-                  <MapPin className="w-4 h-4 text-primary shrink-0" />
-                  <span className="text-sm text-foreground flex-1">{pickupAddress}</span>
+                <div className="flex items-center justify-between gap-3 bg-muted/60 border border-border rounded-xl p-3.5">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <MapPin className="w-4 h-4 text-primary shrink-0" />
+                    <span className="text-sm font-medium text-foreground truncate">{pickupAddress}</span>
+                  </div>
                   <button
+                    type="button"
                     onClick={() => setEditingAddress(true)}
-                    className="text-primary hover:text-primary/80 transition-colors"
+                    className="flex items-center gap-1.5 text-xs font-bold text-primary hover:underline shrink-0 cursor-pointer"
                   >
-                    <Edit2 className="w-4 h-4" />
+                    <Edit2 className="w-3.5 h-3.5" />
+                    Edit Address
                   </button>
                 </div>
               )}
+
               {!user && (
                 <p className="text-xs text-muted-foreground mt-2">
                   <a onClick={() => navigate("/auth")} className="text-primary font-medium cursor-pointer hover:underline">Log in</a> to auto-fill your address

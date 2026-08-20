@@ -309,4 +309,32 @@ const resetPassword = async (req, res) => {
     }
 };
 
-module.exports = { googleAuth, register, verifyOtp, login, getMe, updateProfile, resetAdminRoute, forgotPassword, resetPassword };
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find({}, 'id email phone is_verified profile createdAt').sort({ createdAt: -1 }).lean();
+        res.json(users);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+const updateUserByAdmin = async (req, res) => {
+    const { full_name, mobile_number, address } = req.body;
+    try {
+        const user = await User.findOne({ id: req.params.id });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        user.profile = {
+            ...user.profile,
+            full_name: full_name !== undefined ? full_name : (user.profile ? user.profile.full_name : ''),
+            mobile_number: mobile_number !== undefined ? mobile_number : (user.profile ? user.profile.mobile_number : ''),
+            address: address !== undefined ? address : (user.profile ? user.profile.address : '')
+        };
+        await user.save();
+        res.json({ message: 'User profile updated successfully', user });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+module.exports = { googleAuth, register, verifyOtp, login, getMe, updateProfile, resetAdminRoute, forgotPassword, resetPassword, getAllUsers, updateUserByAdmin };

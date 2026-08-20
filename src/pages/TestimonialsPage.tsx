@@ -61,13 +61,6 @@ const testimonials = [
   },
 ];
 
-const stats = [
-  { number: "5,000+", label: "Happy Customers" },
-  { number: "50,000+", label: "Orders Completed" },
-  { number: "4.9★", label: "Average Rating" },
-  { number: "98%", label: "Satisfaction Rate" },
-];
-
 const TestimonialsPage = () => {
   return (
     <div className="min-h-screen bg-background">
@@ -85,20 +78,6 @@ const TestimonialsPage = () => {
           <p className="text-primary-foreground/70 max-w-lg mx-auto text-sm sm:text-base">
             Real stories from real customers who trust us with their laundry care.
           </p>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="py-10 border-b border-border">
-        <div className="container mx-auto section-padding">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {stats.map((s) => (
-              <div key={s.label} className="text-center">
-                <p className="text-2xl md:text-3xl font-extrabold text-primary">{s.number}</p>
-                <p className="text-sm text-muted-foreground mt-1">{s.label}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 

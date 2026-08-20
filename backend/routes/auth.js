@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, verifyOtp, login, getMe, updateProfile, resetAdminRoute, googleAuth, forgotPassword, resetPassword } = require('../controllers/authController');
+const { register, verifyOtp, login, getMe, updateProfile, resetAdminRoute, googleAuth, forgotPassword, resetPassword, getAllUsers, updateUserByAdmin } = require('../controllers/authController');
 const { verifyToken, verifyAdmin } = require('../middlewares/authMiddleware');
 
 router.post('/register', register);
@@ -12,5 +12,7 @@ router.post('/reset-password', resetPassword);
 router.get('/me', verifyToken, getMe);
 router.put('/profile', verifyToken, updateProfile);
 router.post('/reset-admin', verifyAdmin, resetAdminRoute);
+router.get('/users', verifyAdmin, getAllUsers);
+router.put('/users/:id', verifyAdmin, updateUserByAdmin);
 
 module.exports = router;

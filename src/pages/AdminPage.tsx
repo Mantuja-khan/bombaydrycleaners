@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Loader2, Package, Search, DollarSign, Settings, Edit, Plus, Trash } from "lucide-react";
+import { Loader2, Package, Search, DollarSign, Settings, Edit, Plus, Trash, Users, MapPin } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -34,6 +34,10 @@ const AdminPage = () => {
   const [newIronOnly, setNewIronOnly] = useState("");
   const [newPremiumCare, setNewPremiumCare] = useState("");
 
+  // Editing User Address State
+  const [editingUser, setEditingUser] = useState<any>(null);
+  const [userAddressInput, setUserAddressInput] = useState("");
+
   useEffect(() => {
     if (!authLoading && !user) {
       navigate("/auth");
@@ -54,6 +58,20 @@ const AdminPage = () => {
       return res.json();
     },
     enabled: !!isAdmin,
+  });
+
+  const { data: usersList, isLoading: usersLoading } = useQuery({
+    queryKey: ["admin-users"],
+    queryFn: async (): Promise<any[]> => {
+      const res = await fetch(`${API_URL}/api/auth/users`, {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+      if (!res.ok) throw new Error("Failed to load users");
+      return res.json();
+    },
+    enabled: !!isAdmin && activeTab === "users",
   });
 
   const { data: pricingCategories, isLoading: pricingLoading } = useQuery({
@@ -86,6 +104,27 @@ const AdminPage = () => {
       if (!res.ok) throw new Error("Failed to update order");
       
       toast.success("Order updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
+  const handleUpdateUserAddress = async (userId: string, newAddress: string) => {
+    try {
+      const res = await fetch(`${API_URL}/api/auth/users/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({ address: newAddress })
+      });
+      if (!res.ok) throw new Error("Failed to update user address");
+      toast.success("User delivery address updated successfully");
+      setEditingUser(null);
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
     } catch (err: any) {
       toast.error(err.message);
@@ -195,7 +234,7 @@ const AdminPage = () => {
       </div>
 
       <div className="container mx-auto section-padding py-8 flex-1">
-        <div className="flex justify-center gap-4 mb-8">
+        <div className="flex justify-center gap-4 mb-8 flex-wrap">
           <button
             onClick={() => setActiveTab("orders")}
             className={`flex items-center gap-2 px-6 py-3 rounded-full font-bold transition-all ${
@@ -203,6 +242,14 @@ const AdminPage = () => {
             }`}
           >
             <Package className="w-5 h-5" /> Orders
+          </button>
+          <button
+            onClick={() => setActiveTab("users")}
+            className={`flex items-center gap-2 px-6 py-3 rounded-full font-bold transition-all ${
+              activeTab === "users" ? "bg-primary text-primary-foreground shadow-md" : "bg-muted text-muted-foreground hover:bg-muted/80"
+            }`}
+          >
+            <Users className="w-5 h-5" /> Customers
           </button>
           <button
             onClick={() => setActiveTab("pricing")}
@@ -347,6 +394,28 @@ const AdminPage = () => {
                                 }}
                               />
                             </div>
+                            <div className="mt-2.5 pt-2 border-t border-border/40 flex flex-col sm:flex-row sm:items-center gap-2">
+                              <span className="font-semibold text-muted-foreground whitespace-nowrap flex items-center gap-1">
+                                <MapPin className="w-3.5 h-3.5 text-primary" /> Delivery / Pickup Address:
+                              </span>
+                              <input
+                                type="text"
+                                className="flex-1 text-[11px] border rounded px-2.5 py-1 bg-background text-foreground font-medium"
+                                defaultValue={order.pickup_address || ''}
+                                placeholder="Edit delivery/pickup address for this order & sync to user profile..."
+                                onBlur={(e) => {
+                                  if (e.target.value !== (order.pickup_address || '')) {
+                                    updateOrderFields(order.id, { pickup_address: e.target.value, update_user_address: true });
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    updateOrderFields(order.id, { pickup_address: (e.target as HTMLInputElement).value, update_user_address: true });
+                                  }
+                                }}
+                              />
+                              <span className="text-[10px] text-muted-foreground/80 italic shrink-0">(Syncs to User Profile)</span>
+                            </div>
                           </div>
                         </td>
                       </tr>
@@ -355,6 +424,107 @@ const AdminPage = () => {
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+
+        {activeTab === "users" && (
+          <div className="bg-card border rounded-2xl shadow-sm p-6">
+            <div className="flex items-center justify-between mb-6 border-b pb-4">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Users className="w-5 h-5 text-primary" /> Registered Customers ({usersList?.length || 0})
+              </h2>
+            </div>
+            {usersLoading ? (
+              <div className="py-12 flex justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div className="overflow-x-auto rounded-xl border border-border">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-muted text-foreground font-semibold">
+                    <tr>
+                      <th className="px-6 py-4">Customer Name</th>
+                      <th className="px-6 py-4">Contact</th>
+                      <th className="px-6 py-4">Delivery Address</th>
+                      <th className="px-6 py-4 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {usersList?.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">No registered customers found.</td>
+                      </tr>
+                    )}
+                    {usersList?.map((u: any) => {
+                      const profile = u.profile || {};
+                      const isEditing = editingUser?.id === u.id;
+                      return (
+                        <tr key={u.id} className="hover:bg-muted/10 transition-colors">
+                          <td className="px-6 py-4">
+                            <div className="font-bold text-foreground">{profile.full_name || "No Name"}</div>
+                            {profile.is_admin && (
+                              <span className="inline-block mt-0.5 text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded font-bold">ADMIN</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-xs text-foreground font-medium">{u.email || "No Email"}</div>
+                            <div className="text-xs text-muted-foreground">{profile.mobile_number || u.phone || "No Phone"}</div>
+                          </td>
+                          <td className="px-6 py-4 max-w-xs">
+                            {isEditing ? (
+                              <Input
+                                type="text"
+                                className="text-xs h-9 bg-background"
+                                value={userAddressInput}
+                                onChange={(e) => setUserAddressInput(e.target.value)}
+                                placeholder="Enter full delivery address..."
+                              />
+                            ) : (
+                              <p className="text-xs text-foreground leading-relaxed">
+                                {profile.address || <span className="text-muted-foreground italic">No address set</span>}
+                              </p>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            {isEditing ? (
+                              <div className="flex justify-center gap-2">
+                                <Button
+                                  size="sm"
+                                  className="h-8 text-xs bg-primary text-primary-foreground"
+                                  onClick={() => handleUpdateUserAddress(u.id, userAddressInput)}
+                                >
+                                  Save Address
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-8 text-xs"
+                                  onClick={() => setEditingUser(null)}
+                                >
+                                  Cancel
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 text-xs flex items-center gap-1 mx-auto"
+                                onClick={() => {
+                                  setEditingUser(u);
+                                  setUserAddressInput(profile.address || "");
+                                }}
+                              >
+                                <Edit className="w-3.5 h-3.5" /> Edit Address
+                              </Button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 
